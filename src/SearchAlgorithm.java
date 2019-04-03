@@ -12,7 +12,6 @@
 
 import java.util.ArrayList;
 
-//DOCUMENT CODE
 public class SearchAlgorithm {
 
 	/**
@@ -107,7 +106,7 @@ public class SearchAlgorithm {
 			row = (int)(Math.random()*randomCourse.timeSlotValues.length);
 			col = (int)(Math.random()*problem.rooms.size());
 
-			while(next_schedule.schedule[col][row!=-1]) {
+			while(next_schedule.schedule[col][row]!=-1) {
 				row=(int)(Math.random()*randomCourse.timeSlotValues.length);
 				col=(int)(Math.random()*problem.rooms.size());
 			}

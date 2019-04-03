@@ -12,7 +12,9 @@
 public class Main {
 
 	public static void main(String[] args) {
+		String[] args1 = {"3", "1000", "2000", "2", "0", "2"};
 
+		args = args1;
 		int nBuildings = 0;
 		int nRooms = 0;
 		int nCourses = 0;
@@ -57,10 +59,10 @@ public class Main {
 		if (algorithm == 0) {
 			solution = search.naiveBaseline(test1, deadline);
 		}
-		else if (algorithm == 1){
+		else if(algorithm == 1){
 			solution = search.simulatedAnnealingSolver(test1, deadline);
 		}
-		else if (algorithm == 2){
+		else if(algorithm == 2){
 			solution = search.simulatedAnnealingSolver2(test1, deadline);
 		}
 		else if(algorithm == 3) {

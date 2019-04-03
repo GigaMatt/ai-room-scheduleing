@@ -7,41 +7,67 @@ public class SearchAlgorithm {
   public Schedule solve(SchedulingProblem problem, long deadline) {
 
     // get an empty solution to start from
-	  Schedule current = problem.getEmptySchedule();
+	  Schedule temp = problem.getEmptySchedule();
 	  Schedule next = problem.getEmptySchedule();
 	  int T = 10000;
 	  double deltaE;
 	    
 	  while(true) {
 		  if(T == 0) {
-			  return current;
+			  return temp;
 		  }
 		  next = createNext(problem);
-		  deltaE = problem.evaluateSchedule(next) - problem.evaluateSchedule(current);
+		  
+		  
+		  deltaE = problem.evaluateSchedule(next) - problem.evaluateSchedule(temp);
+		  
+		  
 		  if(deltaE > 0) {
-			  current = next;
+			  
+			  temp = next;
 		  }
 		  T--;
 	  }
   }
 	  
-  private Schedule createNext(SchedulingProblem problem) {
-	  int j = 0;
-	  int k = 0;
-	  Schedule next = problem.getEmptySchedule();
-	  for(int i = 0; i < problem.courses.size(); i++) {
-		  Course randCourse = problem.courses.get(i);
-		  j = (int) (Math.random() * randCourse.timeSlotValues.length);
-		  k = (int) (Math.random() * problem.rooms.size());
-		  while(next.schedule[k][j] != -1) {
-			  j = (int) (Math.random() * randCourse.timeSlotValues.length);
-			  k = (int) (Math.random() * problem.rooms.size());
-		  }
-		  next.schedule[k][j] = i;
-	  }
-	  return next;
-  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  public Schedule solveSim2(SchedulingProblem problem, long deadline) {
+		// get an empty solution to start from
 
+
+	    // get an empty solution to start from
+		  Schedule current = problem.getEmptySchedule();
+		  Schedule next = problem.getEmptySchedule();
+		  double T = 1.0;
+		  double deltaE;
+		  double T_min = .00001;
+		  double alpha = .09;
+		    
+		  while(true) {
+			  
+			  if (T<T_min) {
+				  return current;
+			  }
+			  next = createNext(problem);
+			  deltaE = 2.71828*((problem.evaluateSchedule(next) - problem.evaluateSchedule(current))/T);
+			  if(deltaE > Math.random()) {
+			  }
+			  T= T*alpha;
+		  }
+	  }
+
+	  
+
+  
+  
   public Schedule solveCSP(SchedulingProblem problem, long deadline) {
 	  Schedule solution = problem.getEmptySchedule();
 	  ArrayList<Course> tmp = new ArrayList<Course>(problem.courses);
@@ -49,13 +75,18 @@ public class SearchAlgorithm {
 	  return solution;
   }
   
-  private Schedule solveCSPRec(SchedulingProblem problem, Schedule sol, ArrayList<Course> tmp) {
-	  if(tmp.size() == 0) {
-		  return sol;
+  
+  
+  
+  
+  
+  private Schedule solveCSPRec(SchedulingProblem problem, Schedule solution, ArrayList<Course> temp) {
+	  if(temp.size() == 0) {
+		  return solution;
 	  }
-	 Course c = minRemaining(tmp);
-	 if(c == null) return sol;
-	 tmp.remove(tmp.indexOf(c));
+	 Course c = minRemaining(temp);
+	 if(c == null) return solution;
+	 temp.remove(temp.indexOf(c));
 	 int j=0;
 	 int slots[] = leastContraining(c,problem.courses);
 	 int pos = Integer.MAX_VALUE;
@@ -66,21 +97,84 @@ public class SearchAlgorithm {
 		 }
 	 }
 	 for(int k=0;k<problem.rooms.size();k++) {
-		 if (sol.schedule[k][j] < 0) {
+		 if (solution.schedule[k][j] < 0) {
 			 if(c.enrolledStudents <= problem.rooms.get(k).capacity) {
-				 sol.schedule[k][j] = problem.courses.indexOf(c);
+				 solution.schedule[k][j] = problem.courses.indexOf(c);
 				 break;
 			 }
 		 }
 	 }
 	 c.scheduled = true;
-	 sol = solveCSPRec(problem,sol,tmp);
+	 solution = solveCSPRec(problem,solution,temp);
 	 if(!Solved(problem)) {
 		 c.timeSlotValues[j] = 0;
-		 tmp.add(c);
+		 temp.add(c);
 	 }
-	 return sol;
+	 return solution;
   }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  private Schedule createNext(SchedulingProblem problem) {
+	  int x = 0;
+	  int y = 0;
+	  Schedule next = problem.getEmptySchedule();
+	  
+	  
+	  for(int i = 0; i < problem.courses.size(); i++) {
+		  Course randomCourse = problem.courses.get(i);
+		  x = (int) (Math.random() * randomCourse.timeSlotValues.length);
+		  y = (int) (Math.random() * problem.rooms.size());
+		  
+		  
+		  
+		  while(next.schedule[y][x] != -1) {
+			  x = (int) (Math.random() * randomCourse.timeSlotValues.length);
+			  y = (int) (Math.random() * problem.rooms.size());
+		  }
+		  next.schedule[y][x] = i;
+	  }
+	  return next;
+  }
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+  
+  
+  
   
   //find course selection that leads the least constraining on other courses
   private int[] leastContraining(Course curr, ArrayList<Course> courses) { 
@@ -96,6 +190,10 @@ public class SearchAlgorithm {
 	  }
 	  return conflicts;
   }
+  
+  
+  
+  
   
   //finds course with least remaining possible time slots
   private Course minRemaining(ArrayList<Course> courses) {
@@ -119,6 +217,12 @@ public class SearchAlgorithm {
 	  }
 	  return least;
   }
+  
+  
+  
+  
+  
+  
   
   private Course degree(ArrayList<Course> courses, Course c1, Course c2) { //tie breaker for minRemaining
 	  if(c1 == null && c2 == null) return null;
@@ -150,6 +254,12 @@ public class SearchAlgorithm {
 	  if(sumC2 > sumC1) return c2;
 	  else return c1;
   }
+  
+  
+  
+  
+  
+  
   
   private boolean Solved(SchedulingProblem problem) {
 	  for(int i=0;i<problem.courses.size();i++) {

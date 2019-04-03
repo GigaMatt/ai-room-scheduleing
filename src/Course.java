@@ -3,5 +3,5 @@ public class Course {
   Building preferredLocation;
   int[] timeSlotValues;
   int enrolledStudents;
-  boolean scheduled;
+  boolean scheduled;                                                                                                                                
 }

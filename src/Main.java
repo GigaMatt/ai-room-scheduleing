@@ -1,6 +1,5 @@
 /**
- * CS 165a -- Artificial Intelligence
- * Lab 02 // Assignment 3
+ * CS 165a -- Artificial Intelligence Lab 02 // Assignment 3
  * Main.java
  * By: Hiram A Rios && Matthew S Montoya
  * Instructor: Dr. Chistopher Kiekintveld
@@ -44,7 +43,6 @@ public class Main {
 		System.out.println("Algorithm number: " + algorithm);
 		System.out.println("Random seed: " + seed);
 
-
 		SchedulingProblem test1 = new SchedulingProblem(seed);
 		test1.createRandomInstance(nBuildings, nRooms, nCourses);
 
@@ -56,15 +54,10 @@ public class Main {
 		Schedule solution = null;
 		if (algorithm == 0) {
 			solution = search.naiveBaseline(test1, deadline);
-		}
-		else if(algorithm == 1){
+		} else if (algorithm == 1) {
 			solution = search.simulatedAnnealingSolver(test1, deadline);
-		}
-		else if(algorithm == 2){
-			solution = search.simulatedAnnealingSolver2(test1, deadline);
-		}
-		else if(algorithm == 3) {
-			solution = search.cspSolver(test1, deadline);
+		} else if (algorithm == 2) {
+			solution = search.backtracking(test1, deadline);
 		}
 
 		else {
@@ -83,5 +76,5 @@ public class Main {
 		System.out.println();
 		System.out.println("Score: " + score);
 		System.out.println();
-	}  
+	}
 }

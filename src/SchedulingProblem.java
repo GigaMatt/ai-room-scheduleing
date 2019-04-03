@@ -1,3 +1,4 @@
+
 /**
  * CS 165a -- Artificial Intelligence
  * Lab 02 // Assignment 3
@@ -9,7 +10,7 @@
  * Last Modified: April 3, 2019
  */
 
- import java.util.*;
+import java.util.*;
 
 public class SchedulingProblem {
 
@@ -50,7 +51,7 @@ public class SchedulingProblem {
     for (int i = 0; i < nRooms; i++) {
       Room tmp = new Room();
       tmp.b = buildings.get((int) (random.nextDouble() * nBuildings));
-      tmp.capacity = ((int)(random.nextDouble() * 70)) + 30;
+      tmp.capacity = ((int) (random.nextDouble() * 70)) + 30;
       rooms.add(tmp);
     }
 
@@ -65,7 +66,7 @@ public class SchedulingProblem {
         if (random.nextDouble() < 0.3d) {
           tmp.timeSlotValues[j] = 0;
         } else {
-          tmp.timeSlotValues[j] = (int)(random.nextDouble() * 10);
+          tmp.timeSlotValues[j] = (int) (random.nextDouble() * 10);
         }
       }
       courses.add(tmp);
@@ -97,7 +98,8 @@ public class SchedulingProblem {
       for (int j = 0; j < s[0].length; j++) {
 
         // indicates an unassigned time slot
-        if (s[i][j] < 0 || s[i][j] > courses.size()) continue;
+        if (s[i][j] < 0 || s[i][j] > courses.size())
+          continue;
 
         // class that hase been scheduled more than once
         if (assigned[s[i][j]] > 0) {
@@ -115,7 +117,8 @@ public class SchedulingProblem {
       for (int j = 0; j < s[0].length; j++) {
 
         // indicates an unassigned time slot
-        if (s[i][j] < 0 || s[i][j] > courses.size()) continue;
+        if (s[i][j] < 0 || s[i][j] > courses.size())
+          continue;
 
         Course c = courses.get(s[i][j]);
         Room r = rooms.get(i);

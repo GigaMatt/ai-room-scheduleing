@@ -1,65 +1,89 @@
+/**
+ * CS 165a -- Artificial Intelligence
+ * Lab 02 // Assignment 3
+ * Main.java
+ * By: Hiram A Rios && Matthew S Montoya
+ * Instructor: Dr. Chistopher Kiekintveld
+ * TA: Khandoker Rahad
+ * Purpose: To implement and test two different search methods for solving a class-scheduling problem (Simulated Annealing + Backtracking).
+ * Last Modified: April 2, 2019
+ */
+
 public class Main {
 
-  public static void main(String[] args) {
+	public static void main(String[] args) {
+		String[] args1 = {"3", "1000", "2000", "2", "0", "2"};
 
-    int nBuildings = 0;
-    int nRooms = 0;
-    int nCourses = 0;
-    int TIME_LIMIT_SECONDS = 0;
-    int algorithm = 0;
-    long seed = 0;
+		args = args1;
+		int nBuildings = 0;
+		int nRooms = 0;
+		int nCourses = 0;
+		int TIME_LIMIT_SECONDS = 0;
+		int algorithm = 0;
+		long seed = 0;
 
-    if (args.length == 6) {
-      try {
-        nBuildings = Integer.parseInt(args[0]);
-        nRooms = Integer.parseInt(args[1]);
-        nCourses = Integer.parseInt(args[2]);
-        TIME_LIMIT_SECONDS = Integer.parseInt(args[3]);
-        algorithm = Integer.parseInt(args[4]);
-        seed = Long.parseLong(args[5]);
-      } catch (NumberFormatException e) {
-        System.out.println("Number format exception reading arguments");
-        System.exit(1);
-      }
-    } else {
-      System.out.println("ERROR: Incorrect number of arguments (should have six).");
-      System.exit(1);
-    }
+		if (args.length == 6) {
+			try {
+				nBuildings = Integer.parseInt(args[0]);
+				nRooms = Integer.parseInt(args[1]);
+				nCourses = Integer.parseInt(args[2]);
+				TIME_LIMIT_SECONDS = Integer.parseInt(args[3]);
+				algorithm = Integer.parseInt(args[4]);
+				seed = Long.parseLong(args[5]);
+			} catch (NumberFormatException e) {
+				System.out.println("Number format exception reading arguments");
+				System.exit(1);
+			}
+		} else {
+			System.out.println("ERROR: Incorrect number of arguments (should have six).");
+			System.exit(1);
+		}
 
-    System.out.println("Number of Buildings: " + nBuildings);
-    System.out.println("Number of Rooms: " + nRooms);
-    System.out.println("Number of Courses: " + nCourses);
-    System.out.println("Time limit (s): " + TIME_LIMIT_SECONDS);
-    System.out.println("Algorithm number: " + algorithm);
-    System.out.println("Random seed: " + seed);
+		System.out.println("Number of Buildings: " + nBuildings);
+		System.out.println("Number of Rooms: " + nRooms);
+		System.out.println("Number of Courses: " + nCourses);
+		System.out.println("Time limit (s): " + TIME_LIMIT_SECONDS);
+		System.out.println("Algorithm number: " + algorithm);
+		System.out.println("Random seed: " + seed);
 
 
-    SchedulingProblem test1 = new SchedulingProblem(seed);
-    test1.createRandomInstance(nBuildings, nRooms, nCourses);
+		SchedulingProblem test1 = new SchedulingProblem(seed);
+		test1.createRandomInstance(nBuildings, nRooms, nCourses);
 
-    SearchAlgorithm search = new SearchAlgorithm();
+		SearchAlgorithm search = new SearchAlgorithm();
 
-    long deadline = System.currentTimeMillis() + (1000 * TIME_LIMIT_SECONDS);
+		long deadline = System.currentTimeMillis() + (1000 * TIME_LIMIT_SECONDS);
 
-    // Add your seach algorithms here, each with a unique number
-    Schedule solution = null;
-    if (algorithm == 0) {
-      solution = search.naiveBaseline(test1, deadline);
-    } else {
-      System.out.println("ERROR: Given algorithm number does not exist!");
-      System.exit(1);
-    }
+		// Add your search algorithms here, each with a unique number
+		Schedule solution = null;
+		if (algorithm == 0) {
+			solution = search.naiveBaseline(test1, deadline);
+		}
+		else if(algorithm == 1){
+			solution = search.simulatedAnnealingSolver(test1, deadline);
+		}
+		else if(algorithm == 2){
+			solution = search.simulatedAnnealingSolver2(test1, deadline);
+		}
+		else if(algorithm == 3) {
+			solution = search.cspSolver(test1, deadline);
+		}
 
-    System.out.println("Deadline: " + deadline);
-    System.out.println("Current: " + System.currentTimeMillis());
-    System.out.println("Time remaining: " + (deadline - System.currentTimeMillis()));
-    if (System.currentTimeMillis() > deadline) {
-      System.out.println("EXCEEDED DEADLINE");
-    }
+		else {
+			System.out.println("ERROR: Given algorithm number does not exist!");
+			System.exit(1);
+		}
 
-    double score = test1.evaluateSchedule(solution);
-    System.out.println();
-    System.out.println("Score: " + score);
-    System.out.println();
-  }  
+		System.out.println("Deadline: " + deadline);
+		System.out.println("Current: " + System.currentTimeMillis());
+		System.out.println("Time remaining: " + (deadline - System.currentTimeMillis()));
+		if (System.currentTimeMillis() > deadline) {
+			System.out.println("EXCEEDED DEADLINE");
+		}
+
+		double score = test1.evaluateSchedule(solution);
+		System.out.println();
+		System.out.println("Score: " + score);
+		System.out.println();
+	}  
 }

@@ -6,15 +6,13 @@
  * Instructor: Dr. Chistopher Kiekintveld
  * TA: Khandoker Rahad
  * Purpose: To implement and test two different search methods for solving a class-scheduling problem (Simulated Annealing + Backtracking).
- * Last Modified: April 2, 2019
+ * Last Modified: April 3, 2019
  */
 
 public class Main {
 
 	public static void main(String[] args) {
-		String[] args1 = {"3", "1000", "2000", "2", "0", "2"};
-
-		args = args1;
+		System.in = args;
 		int nBuildings = 0;
 		int nRooms = 0;
 		int nCourses = 0;

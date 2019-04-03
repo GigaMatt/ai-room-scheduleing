@@ -1,94 +1,93 @@
+/**
+ * CS 165a -- Artificial Intelligence
+ * Lab 02 // Assignment 3
+ * SearchAlgorithm.java
+ * By: Hiram A Rios && Matthew S Montoya
+ * Instructor: Dr. Chistopher Kiekintveld
+ * TA: Khandoker Rahad
+ * Purpose: To implement and test two different search methods for solving a class-scheduling problem (Simulated Annealing + Backtracking).
+ * Last Modified: April 2, 2019
+ */
+
 import java.util.ArrayList;
 
 public class SearchAlgorithm {
-
-  // Your search algorithm should return a solution in the form of a valid
-  // schedule before the deadline given (deadline is given by system time in ms)
-  public Schedule solve(SchedulingProblem problem, long deadline) {
-
-    // get an empty solution to start from
-	  Schedule temp = problem.getEmptySchedule();
-	  Schedule next = problem.getEmptySchedule();
-	  int T = 10000;
-	  double deltaE;
+	
+	/**
+	 * Simulated Annealing: First Search Chosen
+	 * @param problem
+	 * @param deadline
+	 * @return
+	 */
+	public Schedule simulatedAnnealing(SchedulingProblem problem, long deadline) {
+	  Schedule current_schedule = problem.getEmptySchedule();
+	  Schedule next_schedule = problem.getEmptySchedule();
+	  int temperature = 10000;
+	  double energy_change_delta;
 	    
 	  while(true) {
-		  if(T == 0) {
-			  return temp;
-		  }
-		  next = createNext(problem);
-		  
-		  
-		  deltaE = problem.evaluateSchedule(next) - problem.evaluateSchedule(temp);
-		  
-		  
-		  if(deltaE > 0) {
-			  
-			  temp = next;
-		  }
-		  T--;
+		  if(temperature == 0)
+			  return current_schedule;
+		  next_schedule = createNextSchedule(problem);
+		  energy_change_delta = problem.evaluateSchedule(next_schedule) - problem.evaluateSchedule(current_schedule);
+		  if(energy_change_delta > 0)
+		  current_schedule = next_schedule;
+		  temperature--;
 	  }
   }
-	  
   
-  
-  
-  
-  
-  
-  
-  
-  
-  public Schedule solveSim2(SchedulingProblem problem, long deadline) {
-		// get an empty solution to start from
+  /**
+   * Simulated Annealing 2: Appraoch at improving standard simulated annealing
+   * @param problem
+   * @param deadline
+   * @return
+   */
+  public Schedule simulatedAnnealing2(SchedulingProblem problem, long deadline) {
+		  Schedule current_schedule = problem.getEmptySchedule();
+		  Schedule next_schedule = problem.getEmptySchedule();
+		  double energy_change_delta, temperature = 1.0, min_temperature = .00001, alpha_value = .09;
 
-
-	    // get an empty solution to start from
-		  Schedule current = problem.getEmptySchedule();
-		  Schedule next = problem.getEmptySchedule();
-		  double T = 1.0;
-		  double deltaE;
-		  double T_min = .00001;
-		  double alpha = .09;
-		    
 		  while(true) {
-			  
-			  if (T<T_min) {
-				  return current;
+			  if (temperature<min_temperature)
+				  return current_schedule;
+			  next_schedule = createNextSchedule(problem);
+			  energy_change_delta = 2.71828*((problem.evaluateSchedule(next_schedule)-problem.evaluateSchedule(current_schedule))/temperature);
+			  if(energy_change_delta > Math.random()) {
+				current_schedule = next_schedule;
 			  }
-			  next = createNext(problem);
-			  deltaE = 2.71828*((problem.evaluateSchedule(next) - problem.evaluateSchedule(current))/T);
-			  if(deltaE > Math.random()) {
-			  }
-			  T= T*alpha;
+			  temperature*=alpha_value;
 		  }
 	  }
 
-	  
-
-  
-  
+/**
+ * Solve Constaint Satisfaction Problem: Step 1 in Backtracking (2nd solution chosen)
+ * @param problem
+ * @param deadline
+ * @return
+ */
   public Schedule solveCSP(SchedulingProblem problem, long deadline) {
-	  Schedule solution = problem.getEmptySchedule();
-	  ArrayList<Course> tmp = new ArrayList<Course>(problem.courses);
-	  solution = solveCSPRec(problem,solution,tmp);
-	  return solution;
+	  Schedule schedule_solution = problem.getEmptySchedule();
+	  ArrayList<Course> temp_course_list = new ArrayList<Course>(problem.course_list);
+	  schedule_solution = solveCSPRec(problem, schedule_solution, temp_course_list);
+	  return schedule_solution;
   }
-  
-  
-  
-  
-  
-  
-  private Schedule solveCSPRec(SchedulingProblem problem, Schedule solution, ArrayList<Course> temp) {
-	  if(temp.size() == 0) {
+
+  /**
+   * Solve Constaint Satisfaction Problem Recursively: Step 2 in Backtracking
+   * @param problem
+   * @param solution
+   * @param temp_course_list
+   * @return
+   */
+  private Schedule solveCSPRec(SchedulingProblem problem, Schedule solution, ArrayList<Course> temp_course_list) {
+	  if(temp_course_list.size() == 0)
 		  return solution;
-	  }
-	 Course c = minRemaining(temp);
-	 if(c == null) return solution;
-	 temp.remove(temp.indexOf(c));
+	 Course course = minRemaining(temp_course_list);
+	 if(course == null)
+	 	return solution;
+	 temp_course_list.remove(temp_course_list.indexOf(course));
 	 int j=0;
-	 int slots[] = leastContraining(c,problem.courses);
+	 int slots[] = leastConstraining(course,problem.course_list);
 	 int pos = Integer.MAX_VALUE;
 	 for(int i=0;i<slots.length;i++) {
 		 if((slots[i]<pos) && (slots[i]>0)) {
@@ -98,177 +97,156 @@ public class SearchAlgorithm {
 	 }
 	 for(int k=0;k<problem.rooms.size();k++) {
 		 if (solution.schedule[k][j] < 0) {
-			 if(c.enrolledStudents <= problem.rooms.get(k).capacity) {
-				 solution.schedule[k][j] = problem.courses.indexOf(c);
+			 if(course.enrolledStudents <= problem.rooms.get(k).capacity) {
+				 solution.schedule[k][j] = problem.course_list.indexOf(c);
 				 break;
 			 }
 		 }
 	 }
-	 c.scheduled = true;
+	 course.scheduled = true;
 	 solution = solveCSPRec(problem,solution,temp);
 	 if(!Solved(problem)) {
-		 c.timeSlotValues[j] = 0;
-		 temp.add(c);
+		course.timeSlotValues[j] = 0;
+		 temp.add(course);
 	 }
 	 return solution;
   }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  private Schedule createNext(SchedulingProblem problem) {
+
+  /**
+   * Create Next Schedule: Creates new schedule from a given problem
+   * @param problem
+   * @return
+   */
+  private Schedule createNextSchedule(SchedulingProblem problem) {
 	  int x = 0;
 	  int y = 0;
-	  Schedule next = problem.getEmptySchedule();
+	  Schedule next_schedule = problem.getEmptySchedule();
 	  
-	  
-	  for(int i = 0; i < problem.courses.size(); i++) {
-		  Course randomCourse = problem.courses.get(i);
-		  x = (int) (Math.random() * randomCourse.timeSlotValues.length);
-		  y = (int) (Math.random() * problem.rooms.size());
+	  for(int i=0; i<problem.course_list.size(); i++) {
+		  Course randomCourse = problem.course_list.get(i);
+		  x = (int)(Math.random()*randomCourse.timeSlotValues.length);
+		  y = (int)(Math.random()*problem.rooms.size());
 		  
-		  
-		  
-		  while(next.schedule[y][x] != -1) {
-			  x = (int) (Math.random() * randomCourse.timeSlotValues.length);
-			  y = (int) (Math.random() * problem.rooms.size());
+		  while(next_schedule.schedule[y][x]!=-1) {
+			  x = (int)(Math.random()*randomCourse.timeSlotValues.length);
+			  y = (int)(Math.random()*problem.rooms.size());
 		  }
-		  next.schedule[y][x] = i;
+		  next_schedule.schedule[y][x]=i;
 	  }
-	  return next;
+	  return next_schedule;
   }
-
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
-  
-  //find course selection that leads the least constraining on other courses
-  private int[] leastContraining(Course curr, ArrayList<Course> courses) { 
-	  int[] conflicts = new int[curr.timeSlotValues.length];
-	  Course c = null;
-	  for(int i=0;i<courses.size();i++) {
-		  c = courses.get(i);
-		  if(courses.indexOf(curr) != i) {
-			  for(int j=0;j<conflicts.length;j++) {
-				  if((c.timeSlotValues[j]>0) && (curr.timeSlotValues[j]>0)) conflicts[j]++;
+  /**
+   * Least Constraining: Find course selection that leads the least constraining on other course_list
+   * @param current_course
+   * @param course_list
+   * @return
+   */
+  private int[] leastConstraining(Course current_course, ArrayList<Course> course_list) { 
+	  int[] conflicts = new int[current_course.timeSlotValues.length];
+	  Course course = null;
+	  for(int i=0; i<course_list.size(); i++) {
+		  course = course_list.get(i);
+		  if(course_list.indexOf(current_course) != i) {
+			  for(int j=0; j<conflicts.length; j++) {
+				  if((couse.timeSlotValues[j]>0) && (current_course.timeSlotValues[j]>0))
+				  	conflicts[j]++;
 			  }
 		  }
 	  }
 	  return conflicts;
   }
-  
-  
-  
-  
-  
-  //finds course with least remaining possible time slots
-  private Course minRemaining(ArrayList<Course> courses) {
-	  Course c = null;
-	  Course least = null;
-	  int min = Integer.MAX_VALUE;
-	  int num;
-	  for(int i=0;i<courses.size();i++) {
-		  c = courses.get(i);
-		  num = 0;
-		  for(int j=0;j<c.timeSlotValues.length;j++) {
-			  if(c.timeSlotValues[j] > 0) num++;
+
+  /**
+   * Minimum Remaining Value: Used for improving search
+   * @param course_list_list
+   * @return
+   */
+  private Course minimumRemainingValue(ArrayList<Course> course_list_list) {
+	  Course course = null;
+	  Course least_course = null;
+	  int minimum = Integer.MAX_VALUE;
+	  int number;
+	  for(int i=0;i<course_list.size();i++) {
+		course = course_list.get(i);
+		number = 0;
+		  for(int j=0;j<course.timeSlotValues.length;j++) {
+			  if(course.timeSlotValues[j]>0)
+			  	number++;
 		  }
-		  if(num<min) {
-			  min = num;
-			  least = c;
+		  if(number<minimum) {
+			minimum = number;
+			least_course = course;
 		  }
-		  if(min == num) {
-			  least = degree(courses,c,least);
+		  if(minimum == number) {
+			least_course = degree(course_list_list, course, least_course);
 		  }
 	  }
-	  return least;
+	  return least_course;
   }
-  
-  
-  
-  
-  
-  
-  
-  private Course degree(ArrayList<Course> courses, Course c1, Course c2) { //tie breaker for minRemaining
-	  if(c1 == null && c2 == null) return null;
-	  if(c1 == null) return c2;
-	  if(c2 == null) return c1;
-	  int[] conflictsC1 = new int[c1.timeSlotValues.length];
-	  int[] conflictsC2 = new int[c1.timeSlotValues.length];
-	  int locC1 = courses.indexOf(c1);
-	  int locC2 = courses.indexOf(c2);
-	  Course c;
-	  for(int i=0;i<courses.size();i++) {
-		  c = courses.get(i);
-		  if((courses.indexOf(c1) != i) && (i != locC2)) {
-			  for(int j=0;j<conflictsC1.length;j++) {
-				  if((c.timeSlotValues[j]>0) && (c1.timeSlotValues[j]>0)) conflictsC1[j]++;
+
+  /**
+   * Degree Heurisitc: Tie breaker for minimumRemainingValue
+   * @param course_list
+   * @param first_course
+   * @param second_course
+   * @return
+   */
+  private Course degree(ArrayList<Course> course_list, Course first_course, Course second_course) {
+	  //Base Cases
+	  if(first_course == null && second_course == null)
+	  	return null;
+	  if(first_course == null)
+	  	return second_course;
+	  if(second_course == null)
+	  	return first_course;
+	  int[] conflicts_first_course = new int[first_course.timeSlotValues.length];
+	  int[] conflicts_second_course = new int[first_course.timeSlotValues.length];
+	  int first_course_location = course_list.indexOf(first_course);
+	  int second_course_location = course_list.indexOf(second_course);
+	  Course course;
+	  for(int i=0;i<course_list.size();i++) {
+		course = course_list.get(i);
+		  if((course_list.indexOf(first_course) != i) && (i != second_course_location)) {
+			  for(int j=0; j<conflicts_first_course.length; j++) {
+				  if((course.timeSlotValues[j]>0) && (first_course.timeSlotValues[j]>0))
+				  	conflicts_first_course[j]++;
 			  }
 		  }
-		  if((courses.indexOf(c2) != i) && (i != locC1)) {
-			  for(int j=0;j<conflictsC2.length;j++) {
-				  if((c.timeSlotValues[j]>0) && (c2.timeSlotValues[j]>0)) conflictsC2[j]++;
+		  if((course_list.indexOf(second_course) != i) && (i != first_course_location)) {
+			  for(int j=0; j<conflicts_second_course.length; j++) {
+				  if((course.timeSlotValues[j]>0) && (second_course.timeSlotValues[j]>0))
+				  	conflicts_second_course[j]++;
 			  }
 		  }
 	  }
-	  int sumC1=0,sumC2=0;
-	  for(int i=0;i<c1.timeSlotValues.length;i++) {
-		  sumC1 += conflictsC1[i];
-		  sumC2 += conflictsC2[i];
+	  int first_course_total=0;
+	  int second_course_total=0;
+	  for(int i=0; i<first_course.timeSlotValues.length; i++) {
+		  first_course_total+= conflicts_first_course[i];
+		  second_course_total+= conflicts_second_course[i];
 	  }
-	  if(sumC2 > sumC1) return c2;
-	  else return c1;
+	  if(second_course_total>first_course_total)
+	  	return second_course;
+	  else
+	  	return first_course;
   }
-  
-  
-  
-  
-  
-  
-  
+
+  /**
+   * Solved: 
+   * @param problem
+   * @return
+   */
   private boolean Solved(SchedulingProblem problem) {
-	  for(int i=0;i<problem.courses.size();i++) {
-		  Course c = problem.courses.get(i);
-		  if(!c.scheduled) return false;
+	  for(int i=0; i<problem.course_list.size(); i++) {
+		  Course course = problem.course_list.get(i);
+		  if(!course.scheduled)
+		  	return false;
 	  }
 	  return true;
   }
-  
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // This is a very naive baseline scheduling strategy
   // It should be easily beaten by any reasonable strategy
@@ -277,8 +255,8 @@ public class SearchAlgorithm {
     // get an empty solution to start from
     Schedule solution = problem.getEmptySchedule();
 
-    for (int i = 0; i < problem.courses.size(); i++) {
-      Course c = problem.courses.get(i);
+    for (int i = 0; i < problem.course_list.size(); i++) {
+      Course c = problem.course_list.get(i);
       boolean scheduled = false;
       for (int j = 0; j < c.timeSlotValues.length; j++) {
         if (scheduled) break;

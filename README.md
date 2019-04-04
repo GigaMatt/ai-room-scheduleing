@@ -1,5 +1,5 @@
 # Artificial Intelligence Class Scheduling with Tree Searching
-## Java Project for Implementing A.I. Tree Searches (Simulated Annealing + Backtracking)
+## Implementing A.I. Tree Searches (Simulated Annealing + Backtracking)
 ![alt text](https://raw.githubusercontent.com/gigamatt/ai-room-scheduleing/master/img/readme_image.png)
 
 ## About

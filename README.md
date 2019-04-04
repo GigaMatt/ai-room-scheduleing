@@ -10,16 +10,17 @@ _Tree Search + Pathfinding_ is a midterm project by Matthew Montoya & Hiram Rios
 ## How To Compile/Run
 1. Open the directory to **/ai-room-scheduling/**
 2. Execute jar file by typing in: **java -jar homework3.jar** <your-six-paramters>
+
 **NOTE FOR EXECUTION PARAMETERS:**
-    The first parameter is the number of buildings (int value).
-    The second parameter is the number of rooms (int value).
-    The third paramter is the number of courses (int value).
-    The fourth parameter is the time limit (in seconds [int value]).
-    The fifth parameter is the algorithm number (int value [see below])
-    **Algorithm 0 is Naive Baseline**
-    **Algorithm 1 is Simulated Annealing**
-    **Algorithm 2 is Backtracking**
-    The sixth paramter is the seed value (long value)
+1. The first parameter is the number of buildings (int value).
+2. The second parameter is the number of rooms (int value).
+3. The third paramter is the number of courses (int value).
+4. The fourth parameter is the time limit (in seconds [int value]).
+5. The fifth parameter is the algorithm number (int value [see below])
+**Algorithm 0 is Naive Baseline**
+**Algorithm 1 is Simulated Annealing**
+**Algorithm 2 is Backtracking**
+6. The sixth paramter is the seed value (long value)
 
 Alternatively, the _.java_ files may be imported into your IDE and run locally
 
